@@ -1,0 +1,26 @@
+services:
+  # Database service
+  db:
+    image: postgres:15-alpine
+    container_name: exchange_db
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=exchange
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
+
+  # (Optional) PgAdmin - Web-based database management UI
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: exchange_pgadmin
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@admin.com
+      - PGADMIN_DEFAULT_PASSWORD=admin
+    ports:
+      - "5050:80"
+    depends_on:
+      - db

@@ -2,19 +2,21 @@ package main
 
 import (
 	"my-exchange/api"
-	"my-exchange/internal/infrastructure" // 引入
+	"my-exchange/internal/infrastructure"
 	"my-exchange/internal/service"
 
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
-	// 1. 初始化資料庫
+	// Initialize database
 	infrastructure.InitDB()
+
+	db := infrastructure.DB
 
 	r := gin.Default()
 
-	orderSvc := service.NewOrderService()
+	orderSvc := service.NewOrderService(db)
 	orderHandler := api.NewHandler(orderSvc)
 
 	r.GET("/ping", func(c *gin.Context) {
