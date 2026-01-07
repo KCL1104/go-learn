@@ -10,8 +10,8 @@ import (
 
 type OrderRequest struct {
 	Symbol   string          `json:"symbol" binding:"required"`
-	Price    decimal.Decimal `json:"price" binding:"required,gt=0"`
-	Quantity decimal.Decimal `json:"quantity" binding:"required,gt=0"`
+	Price    decimal.Decimal `json:"price" binding:"required"`
+	Quantity decimal.Decimal `json:"quantity" binding:"required"`
 	Side     string          `json:"side" binding:"required,oneof=buy sell"`
 }
 
@@ -32,6 +32,21 @@ func (h *Handler) CreateOrder(c *gin.Context) {
 	var req OrderRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	if req.Price.LessThanOrEqual(decimal.Zero) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "price must be greater than 0"})
+		return
+	}
+
+	if req.Quantity.LessThanOrEqual(decimal.Zero) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "quantity must be greater than 0"})
+		return
+	}
+
+	if req.Side != "buy" && req.Side != "sell" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "side must be 'buy' or 'sell'"})
 		return
 	}
 
